@@ -1,0 +1,106 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background: #f4f4f4;
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.schedule-container {
+    overflow-x: auto;
+    background: white;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.schedule-grid {
+    display: grid;
+
+    grid-template-columns: 
+        100px
+        120px
+        120px
+        120px
+        120px
+        150px
+        200px;
+
+    min-width: 900px;
+}
+
+.header {
+    font-weight: bold;
+    color: white;
+    padding: 12px;
+    text-align: center;
+}
+
+.room {
+    background: #2e3d45;
+    font-weight: bold;
+}
+
+.morning {
+    background: #4caf50;
+}
+
+.lunch {
+    background: #fbc02d;
+}
+
+.dinner {
+    background: #2196f3;
+}
+
+.evening {
+    background: #3f51b5;
+}
+
+.shower {
+    background: #4c606c;
+}
+
+.notes {
+    background: #9d7c70;
+}
+
+.cell {
+    border: 1px solid #ddd;
+    padding: 10px;
+    background: white;
+    min-height: 70px;
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.done {
+    text-decoration: line-through;
+    color: gray;
+}
+
+.save-message {
+    margin-top: 15px;
+    color: green;
+    text-align: center;
+    font-weight: bold;
+}
+
+@media (max-width: 76px) {
+    body {
+        padding: 10px;
+    }
+}
