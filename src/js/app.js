@@ -1,5 +1,7 @@
+import { state } from "./state.js";
+
 // DATA
-const residents = [
+export const residents = [
     {
         room: "1604",
         morning: ["08:00"],
@@ -38,30 +40,23 @@ const residents = [
     }
 ];
 
-// HTML CONTAINER
-const schedule = document.getElementById("schedule");
-
-
-// LOAD SAVED DATA
-let savedTasks = JSON.parse(localStorage.getItem("completedTasks")) || {};
-
 
 // CREATE TASK
-function createTask(room, time) {
+export function createTask(room, time) {
 
     const taskId = `${room}-${time}`;
 
-    const checked = savedTasks[taskId] ? "checked" : "";
+    const checked = state.savedTasks[taskId] ? "checked" : "";
 
-    const doneClass = savedTasks[taskId] ? "done" : "";
+    const doneClass = state.savedTasks[taskId] ? "done" : "";
 
     return `
         <div class="task">
 
             <input
                 type="checkbox"
+                data-task-id="${taskId}"
                 ${checked}
-                onchange="toggleTask('${taskId}', this)"
             />
 
             <span class="${doneClass}">
