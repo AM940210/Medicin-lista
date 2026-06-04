@@ -1,12 +1,11 @@
+import { state, saveTasks } from "./state.js";
+
 // TOGGLE CHECKBOX
-function toggleTask(taskId, checkbox) {
+export function toggleTask(taskId, checkbox) {
 
-    savedTasks[taskId] = checkbox.checked;
+    state.savedTasks[taskId] = checkbox.checked;
 
-    localStorage.setItem(
-        "completedTasks",
-        JSON.stringify(savedTasks)
-    );
+    saveTasks();
 
     const span = checkbox.nextElementSibling;
 
@@ -20,7 +19,7 @@ function toggleTask(taskId, checkbox) {
 }
 
 // SAVE MESSAGE
-function showMessage() {
+export function showMessage() {
 
     const message = document.getElementById("message");
 
