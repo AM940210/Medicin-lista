@@ -1,3 +1,12 @@
+import { residents, createTask } from "./app.js";
+import { toggleTask } from "./tasks.js";
+import { loadSavedTasks } from "./state.js";
+
+const schedule = document.getElementById("schedule");
+
+// ensure persisted state is loaded
+loadSavedTasks();
+
 // RENDER DATA
 residents.forEach(person => {
     schedule.innerHTML += `
@@ -18,6 +27,12 @@ residents.forEach(person => {
         </div>
 
         <div class="cell">
+            ${person.dinner.map(time =>
+                createTask(person.room, time)
+            ).join("")}
+        </div>
+
+        <div class="cell">
             ${person.evening.map(time =>
                 createTask(person.room, time)
             ).join("")}
@@ -32,3 +47,11 @@ residents.forEach(person => {
         </div>
     `;
 })
+
+// attach event listeners to checkboxes (no inline handlers)
+document.querySelectorAll('.task input[type=""checkbox]').forEach(input => {
+    input.addEventListener('change', (e) => {
+        const id = input.dataset.taskId;
+        toggleTask(id, input);
+    });
+});
