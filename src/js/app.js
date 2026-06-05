@@ -8,7 +8,7 @@ export const residents = [
         lunch: ["12:00"],
         dinner: ["14:00"],
         evening: ["20:00", "21:00"],
-        shower: "Torsdag",
+        shower: "Ons & Lör på Kväll + Renbäddning",
         notes: ""
     },
     {

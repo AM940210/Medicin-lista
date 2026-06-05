@@ -3,8 +3,9 @@ import { toggleTask } from "./tasks.js";
 import { loadSavedTasks } from "./state.js";
 
 const schedule = document.getElementById("schedule");
+if (!schedule) throw new Error("#schedule element not found");
 
-// ensure persisted state is loaded
+// load persisted state before rendering
 loadSavedTasks();
 
 // RENDER DATA
@@ -48,9 +49,9 @@ residents.forEach(person => {
     `;
 })
 
-// attach event listeners to checkboxes (no inline handlers)
-document.querySelectorAll('.task input[type=""checkbox]').forEach(input => {
-    input.addEventListener('change', (e) => {
+// attach event listeners to checkboxes (fix broken selector)
+document.querySelectorAll('.task input[type="checkbox"]').forEach(input => {
+    input.addEventListener('change', () => {
         const id = input.dataset.taskId;
         toggleTask(id, input);
     });
