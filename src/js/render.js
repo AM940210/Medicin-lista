@@ -5,54 +5,264 @@ import { loadSavedTasks } from "./state.js";
 const schedule = document.getElementById("schedule");
 if (!schedule) throw new Error("#schedule element not found");
 
+const editorStorageKey = "medicin-list-editor";
+
+const baseColumns = [
+    { key: "room", label: "Lgh", type: "text", width: "100px", addable: false },
+    { key: "morning", label: "Morgon", type: "tasks", width: "120px", addable: true },
+    { key: "lunch", label: "Lunch", type: "tasks", width: "120px", addable: true },
+    { key: "dinner", label: "Middag", type: "tasks", width: "120px", addable: true },
+    { key: "evening", label: "Kväll", type: "tasks", width: "120px", addable: true },
+    { key: "shower", label: "Dusch", type: "text", width: "150px", addable: false },
+    { key: "notes", label: "Överigt", type: "text", width: "200px", addable: false }
+];
+
+function escapeHtml(value) {
+    return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function cloneRows(sourceRows) {
+    return sourceRows.map(person => ({
+        room: person.room ?? "",
+        morning: [...(person.morning ?? [])],
+        lunch: [...(person.lunch ?? [])],
+        dinner: [...(person.dinner ?? [])],
+        evening: [...(person.evening ?? [])],
+        shower: person.shower ?? "",
+        notes: person.notes ?? "",
+        extra: person.extra ?? {}
+    }));
+}
+
+function createBlankRow() {
+    return {
+        room: "",
+        morning: [],
+        lunch: [],
+        dinner: [],
+        evening: [],
+        shower: "",
+        notes: "",
+        extra: {}
+    };
+}
+
+function loadEditorState() {
+    const fallback = {
+        rows: cloneRows(residents),
+        extraColumns: []
+    };
+
+    try {
+        const raw = localStorage.getItem(editorStorageKey);
+        if (!raw) {
+            return fallback;
+        }
+
+        const parsed = JSON.parse(raw);
+        return {
+            rows: Array.isArray(parsed.rows) ? parsed.rows : fallback.rows,
+            extraColumns: Array.isArray(parsed.extraColumns) ? parsed.extraColumns : fallback.extraColumns
+        };
+    } catch {
+        return fallback;
+    }
+}
+
+const editorState = loadEditorState();
+
 // load persisted state before rendering
 loadSavedTasks();
 
-// RENDER DATA
-residents.forEach(person => {
-    schedule.innerHTML += `
-        <div class="cell room">
-            ${person.room}
-        </div>
+function saveEditorState() {
+    localStorage.setItem(editorStorageKey, JSON.stringify(editorState));
+}
 
-        <div class="cell">
-            ${person.morning.map(time =>
-                createTask(person.room, time)
-            ).join("")}
-        </div>
+function getColumns() {
+    const columns = [...baseColumns];
 
-        <div class="cell">
-            ${person.lunch.map(time =>
-                createTask(person.room, time)
-            ).join("")}
-        </div>
+    editorState.extraColumns.forEach(extraColumn => {
+        const anchorIndex = columns.findIndex(column => column.key === extraColumn.afterKey);
+        const insertIndex = anchorIndex >= 0 ? anchorIndex + 1 : columns.length;
+        columns.splice(insertIndex, 0, extraColumn);
+    });
 
-        <div class="cell">
-            ${person.dinner.map(time =>
-                createTask(person.room, time)
-            ).join("")}
-        </div>
+    columns.push({ key: "actions", label: "Add", type: "actions", width: "120px", addable: false });
 
-        <div class="cell">
-            ${person.evening.map(time =>
-                createTask(person.room, time)
-            ).join("")}
-        </div>
+    return columns;
+}
 
-        <div class="cell">
-            ${person.shower}
-        </div>
+function getGridTemplate(columns) {
+    return columns.map(column => column.width || "120px").join(" ");
+}
 
+function addRow(afterIndex) {
+    const nextRows = cloneRows(editorState.rows);
+    nextRows.splice(afterIndex + 1, 0, createBlankRow());
+    editorState.rows = nextRows;
+    saveEditorState();
+    render();
+}
+
+function addColumn(afterKey) {
+    const nextColumns = [...editorState.extraColumns];
+    const nextNumber = nextColumns.length + 1;
+    const newColumn = {
+        key: `extra-${Date.now()}-${nextNumber}`,
+        label: `Extra ${nextNumber}`,
+        type: "text",
+        width: "180px",
+        addable: false,
+        afterKey
+    };
+
+    editorState.extraColumns = nextColumns;
+    editorState.rows = editorState.rows.map(row => ({
+        ...row,
+        extra: {
+            ...(row.extra || {}),
+            [newColumn.key]: ""
+        }
+    }));
+    saveEditorState();
+    render();
+}
+
+function updateField(rowIndex, field, value) {
+    editorState.rows[rowIndex][field] = value;
+    saveEditorState();
+}
+
+function updateExtraField(rowIndex, columnKey, value) {
+    editorState.rows[rowIndex].extra = {
+        ...(editorState.rows[rowIndex].extra || {}),
+        [columnKey]: value
+    };
+    saveEditorState();
+}
+
+function renderHeader(columns) {
+    return columns.map(column => {
+        const button = column.addable
+        ? `<button class="mini-btn" data-action="add-column" data-after-key="${column.key}" title="Add a column after ${escapeHtml(column.label)}"></button>`
+        : "";
+
+        return `
+            <div class="header" ${column.key === "actions" ? "action-cell" : "header-cell"}>
+                <span>${escapeHtml(column-label)}</span>
+                ${button}
+            </div>
+        `;
+    }).join("");
+}
+
+function renderTextCell(value, rowIndex, field) {
+    return `
         <div class="cell">
-            ${person.notes}
+            <input 
+                class="text-input"
+                type="text"
+                value="${escapeHtml(value)}"
+                data-row-index="${rowIndex}"
+                data-field="${field}"
+            />
         </div>
     `;
-})
+}
 
-// attach event listeners to checkboxes (fix broken selector)
-document.querySelectorAll('.task input[type="checkbox"]').forEach(input => {
-    input.addEventListener('change', () => {
-        const id = input.dataset.taskId;
-        toggleTask(id, input);
+function renderExtraCell(value, rowIndex, columnKey) {
+    return `
+        <div class="cell">
+            <input
+                class="text-input"
+                type="text"
+                value="${escapeHtml(value)}"
+                data-row-index="rowIndex"
+                data-extra-key="${columnKey}"
+            />
+        </div>
+    `;
+}
+
+function renderRow(row, rowIndex, columns) {
+    const taskColumns = ["morning", "lunch", "dinner", "evening"];
+
+    const cells = columns.map(column => {
+        if (column.key === "room" || column.key === "shower" || column.key === "notes") {
+            return renderTextCell(row[column.key] ?? "", rowIndex, column.key);
+        }
+
+        if (taskColumns.includes(column.key)) {
+            return `
+                <div class="cell">
+                    ${(row[column.key] ?? []).map(time => createTask(row.room || `row-${rowIndex}`, time)).join("")}
+                </div>
+            `;
+        }
+
+        if (column.type === "text") {
+            return renderExtraCell((row.extra || {}) [column.key] ?? "", rowIndex, column.key);
+        }
+
+        if (column.key === "actions") {
+            return `
+                <div class="cell action-cell">
+                    <button class="mini-btn secondary" data-action="add-row" data-row-index="${rowIndex}">+ Row</button>
+                </div>
+            `;
+        }
+
+        return `<div class="cell"></div>`;
     });
-});
+
+    return cells.join("");
+}
+
+function render() {
+    const columns = getColumns();
+    schedule.style.gridTemplateColumns = getGridTemplate(columns);
+
+    schedule.innerHTML = [renderHeader(columns), ...editorState.rows.map((row), rowIndex) => renderRow(row, rowIndex, columns)].join("");
+
+    schedule.querySelectorAll('input[data.field]').forEach(input => {
+        input.addEventListener("input", () => {
+            const rowIndex = Number(input.dataset.rowIndex);
+            const field = input.dataset.field;
+            updateField(rowIndex, field, input.value);
+        });
+    });
+
+    schedule.querySelectorAll('input[data-extra-key]').forEach(input => {
+        input.addEventListener("input", () => {
+            const rowIndex = Number(input.dataset.rowIndex);
+            const columnKey = input.dataset.extraKey;
+            updateExtraField(rowIndex, columnKey, input.value);
+        });
+    });
+
+    schedule.querySelectedAll('.task input[type="checkbox"]').forEach(input => {
+        input.addEventListener("change", () => {
+            const id = input.dataset.taskId;
+            toggleTask(id, input);
+        });
+    });
+
+    schedule.querySelectorAll('[data-action="add-row"]').forEach(button => {
+        button.addEventListener("click", () => {
+            addRow(Number(button.dataset.rowIndex));
+        });
+    });
+
+    schedule.querySelectorAll('[data-action="add-column"]').forEach(button => {
+        button.addEventListener("click", () => {
+            addColumn(button.dataset.afterKey);
+        });
+    });
+}
+
+render();
