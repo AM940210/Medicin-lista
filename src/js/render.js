@@ -21,7 +21,7 @@ function escapeHtml(value) {
     return String(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt")
+    .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
 }
@@ -121,6 +121,7 @@ function addColumn(afterKey) {
         afterKey
     };
 
+    nextColumns.push(newColumn);
     editorState.extraColumns = nextColumns;
     editorState.rows = editorState.rows.map(row => ({
         ...row,
@@ -153,8 +154,8 @@ function renderHeader(columns) {
         : "";
 
         return `
-            <div class="header" ${column.key === "actions" ? "action-cell" : "header-cell"}>
-                <span>${escapeHtml(column-label)}</span>
+            <div class="${column.key === "actions" ? "action-cell" : "header-cel"} header">
+                <span>${escapeHtml(column.label)}</span>
                 ${button}
             </div>
         `;
@@ -182,7 +183,7 @@ function renderExtraCell(value, rowIndex, columnKey) {
                 class="text-input"
                 type="text"
                 value="${escapeHtml(value)}"
-                data-row-index="rowIndex"
+                data-row-index="${rowIndex}"
                 data-extra-key="${columnKey}"
             />
         </div>
@@ -227,9 +228,14 @@ function render() {
     const columns = getColumns();
     schedule.style.gridTemplateColumns = getGridTemplate(columns);
 
-    schedule.innerHTML = [renderHeader(columns), ...editorState.rows.map((row), rowIndex) => renderRow(row, rowIndex, columns)].join("");
+    schedule.innerHTML = [
+        renderHeader(columns),
+        ...editorState.rows.map((row, rowIndex) =>
+        renderRow(row, rowIndex, columns)
+        )
+    ].join("");
 
-    schedule.querySelectorAll('input[data.field]').forEach(input => {
+    schedule.querySelectorAll('input[data-field]').forEach(input => {
         input.addEventListener("input", () => {
             const rowIndex = Number(input.dataset.rowIndex);
             const field = input.dataset.field;
@@ -245,7 +251,7 @@ function render() {
         });
     });
 
-    schedule.querySelectedAll('.task input[type="checkbox"]').forEach(input => {
+    schedule.querySelectorAll('.task input[type="checkbox"]').forEach(input => {
         input.addEventListener("change", () => {
             const id = input.dataset.taskId;
             toggleTask(id, input);
