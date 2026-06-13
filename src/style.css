@@ -30,9 +30,10 @@ h1 {
 
 .header {
     font-weight: bold;
-    color: white;
+    color: black;
     padding: 12px;
     text-align: center;
+    border: 1px solid red;
 }
 
 .header.cell {
@@ -95,7 +96,7 @@ h1 {
 
 .mini-btn {
     border: none;
-    border-radius: 999;
+    border-radius: 999px;
     padding: 6px 10px;
     background: #1f2933;
     color: #fff;
@@ -134,7 +135,7 @@ h1 {
     font-weight: bold;
 }
 
-@media (max-width: 76px) {
+@media (max-width: 768px) {
     body {
         padding: 10px;
     }

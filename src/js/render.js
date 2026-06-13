@@ -1,3 +1,5 @@
+console.log("render.js stated");
+
 import { residents, createTask } from "./app.js";
 import { toggleTask } from "./tasks.js";
 import { loadSavedTasks } from "./state.js";
@@ -37,19 +39,6 @@ function cloneRows(sourceRows) {
         notes: person.notes ?? "",
         extra: person.extra ?? {}
     }));
-}
-
-function createBlankRow() {
-    return {
-        room: "",
-        morning: [],
-        lunch: [],
-        dinner: [],
-        evening: [],
-        shower: "",
-        notes: "",
-        extra: {}
-    };
 }
 
 function loadEditorState() {
@@ -92,21 +81,11 @@ function getColumns() {
         columns.splice(insertIndex, 0, extraColumn);
     });
 
-    columns.push({ key: "actions", label: "Add", type: "actions", width: "120px", addable: false });
-
     return columns;
 }
 
 function getGridTemplate(columns) {
     return columns.map(column => column.width || "120px").join(" ");
-}
-
-function addRow(afterIndex) {
-    const nextRows = cloneRows(editorState.rows);
-    nextRows.splice(afterIndex + 1, 0, createBlankRow());
-    editorState.rows = nextRows;
-    saveEditorState();
-    render();
 }
 
 function addColumn(afterKey) {
@@ -154,7 +133,7 @@ function renderHeader(columns) {
         : "";
 
         return `
-            <div class="${column.key === "actions" ? "action-cell" : "header-cel"} header">
+            <div class="header ${column.key}">
                 <span>${escapeHtml(column.label)}</span>
                 ${button}
             </div>
@@ -210,14 +189,6 @@ function renderRow(row, rowIndex, columns) {
             return renderExtraCell((row.extra || {}) [column.key] ?? "", rowIndex, column.key);
         }
 
-        if (column.key === "actions") {
-            return `
-                <div class="cell action-cell">
-                    <button class="mini-btn secondary" data-action="add-row" data-row-index="${rowIndex}">+ Row</button>
-                </div>
-            `;
-        }
-
         return `<div class="cell"></div>`;
     });
 
@@ -258,12 +229,6 @@ function render() {
         });
     });
 
-    schedule.querySelectorAll('[data-action="add-row"]').forEach(button => {
-        button.addEventListener("click", () => {
-            addRow(Number(button.dataset.rowIndex));
-        });
-    });
-
     schedule.querySelectorAll('[data-action="add-column"]').forEach(button => {
         button.addEventListener("click", () => {
             addColumn(button.dataset.afterKey);
@@ -271,4 +236,11 @@ function render() {
     });
 }
 
-render();
+console.log("About to render");
+
+try {
+    render();
+    console.log("Render success");
+} catch (err) {
+    console.error("Render error:", err);
+}
