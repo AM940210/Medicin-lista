@@ -3,6 +3,7 @@ console.log("render.js stated");
 import { residents, createTask } from "./app.js";
 import { toggleTask } from "./tasks.js";
 import { loadSavedTasks } from "./state.js";
+import { currentUser } from "./auth.js";
 
 const schedule = document.getElementById("schedule");
 if (!schedule) throw new Error("#schedule element not found");
@@ -89,11 +90,19 @@ function getGridTemplate(columns) {
 }
 
 function addColumn(afterKey) {
+
+    if (currentUser.role !== "admin") {
+        alert("Only administrators can add columns");
+        return;
+    }
+
     const nextColumns = [...editorState.extraColumns];
+
     const nextNumber = nextColumns.length + 1;
+
     const newColumn = {
         key: `extra-${Date.now()}-${nextNumber}`,
-        label: `Extra ${nextNumber}`,
+        label: prompt("Medication time?") || `Extra ${nextNumber}`,
         type: "text",
         width: "180px",
         addable: false,
@@ -101,7 +110,9 @@ function addColumn(afterKey) {
     };
 
     nextColumns.push(newColumn);
+
     editorState.extraColumns = nextColumns;
+
     editorState.rows = editorState.rows.map(row => ({
         ...row,
         extra: {
@@ -109,6 +120,7 @@ function addColumn(afterKey) {
             [newColumn.key]: ""
         }
     }));
+    
     saveEditorState();
     render();
 }
@@ -128,8 +140,17 @@ function updateExtraField(rowIndex, columnKey, value) {
 
 function renderHeader(columns) {
     return columns.map(column => {
-        const button = column.addable
-        ? `<button class="mini-btn" data-action="add-column" data-after-key="${column.key}" title="Add a column after ${escapeHtml(column.label)}"></button>`
+        const button =
+            currentUser.role === "admin" && column.addable
+        ? `
+            <button 
+                class="mini-btn"
+                data-action="add-column" 
+                data-after-key="${column.key}"
+            >
+                +
+            </button>
+        `
         : "";
 
         return `
@@ -142,6 +163,12 @@ function renderHeader(columns) {
 }
 
 function renderTextCell(value, rowIndex, field) {
+
+    const readonly = 
+        currentUser.role === "staff"
+            ? "readonly"
+            : "";
+
     return `
         <div class="cell">
             <input 
@@ -150,6 +177,7 @@ function renderTextCell(value, rowIndex, field) {
                 value="${escapeHtml(value)}"
                 data-row-index="${rowIndex}"
                 data-field="${field}"
+                ${readonly}
             />
         </div>
     `;
