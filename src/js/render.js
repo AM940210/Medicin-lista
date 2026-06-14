@@ -166,7 +166,7 @@ function renderTextCell(value, rowIndex, field) {
 
     const readonly = 
         currentUser.role === "staff"
-            ? "readonly"
+            ? "disabled"
             : "";
 
     return `
@@ -184,6 +184,12 @@ function renderTextCell(value, rowIndex, field) {
 }
 
 function renderExtraCell(value, rowIndex, columnKey) {
+
+    const disabled = 
+        currentUser.role === "staff"
+            ? "disabled"
+            : "";
+
     return `
         <div class="cell">
             <input
@@ -192,6 +198,7 @@ function renderExtraCell(value, rowIndex, columnKey) {
                 value="${escapeHtml(value)}"
                 data-row-index="${rowIndex}"
                 data-extra-key="${columnKey}"
+                ${disabled}
             />
         </div>
     `;
