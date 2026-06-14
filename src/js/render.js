@@ -164,7 +164,7 @@ function renderHeader(columns) {
 
 function renderTextCell(value, rowIndex, field) {
 
-    const readonly = 
+    const disabled = 
         currentUser.role === "staff"
             ? "disabled"
             : "";
@@ -177,10 +177,22 @@ function renderTextCell(value, rowIndex, field) {
                 value="${escapeHtml(value)}"
                 data-row-index="${rowIndex}"
                 data-field="${field}"
-                ${readonly}
+                ${disabled}
             />
         </div>
     `;
+}
+
+function renderNotesCell(value, rowIndex) {
+    return `
+        <div class="cell">
+            <textarea
+                class="notes-input"
+                data-row-index="${rowIndex}"
+                data-field="notes"
+            >${escapeHtml(value)}</textarea>
+        </div>
+    `
 }
 
 function renderExtraCell(value, rowIndex, columnKey) {
@@ -208,8 +220,19 @@ function renderRow(row, rowIndex, columns) {
     const taskColumns = ["morning", "lunch", "dinner", "evening"];
 
     const cells = columns.map(column => {
-        if (column.key === "room" || column.key === "shower" || column.key === "notes") {
-            return renderTextCell(row[column.key] ?? "", rowIndex, column.key);
+        if (column.key === "room" || column.key === "shower") {
+            return renderTextCell(
+                row[column.key] ?? "", 
+                rowIndex, 
+                column.key
+            );
+        }
+
+        if (column.key === "notes") {
+            return renderNotesCell(
+                row.notes ?? "",
+                rowIndex
+            );
         }
 
         if (taskColumns.includes(column.key)) {
