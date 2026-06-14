@@ -10,14 +10,16 @@ if (!schedule) throw new Error("#schedule element not found");
 
 const editorStorageKey = "medicin-list-editor";
 
+const columnWidth = "170px"
+
 const baseColumns = [
-    { key: "room", label: "Lgh", type: "text", width: "100px", addable: false },
-    { key: "morning", label: "Morgon", type: "tasks", width: "120px", addable: true },
-    { key: "lunch", label: "Lunch", type: "tasks", width: "120px", addable: true },
-    { key: "dinner", label: "Middag", type: "tasks", width: "120px", addable: true },
-    { key: "evening", label: "Kväll", type: "tasks", width: "120px", addable: true },
-    { key: "shower", label: "Dusch", type: "text", width: "150px", addable: false },
-    { key: "notes", label: "Överigt", type: "text", width: "200px", addable: false }
+    { key: "room", label: "Lgh", type: "text", width: columnWidth },
+    { key: "morning", label: "Morgon", type: "tasks", width: columnWidth },
+    { key: "lunch", label: "Lunch", type: "tasks", width: columnWidth },
+    { key: "dinner", label: "Middag", type: "tasks", width: columnWidth },
+    { key: "evening", label: "Kväll", type: "tasks", width: columnWidth },
+    { key: "shower", label: "Dusch", type: "text", width: columnWidth },
+    { key: "notes", label: "Överigt", type: "text", width: columnWidth }
 ];
 
 function escapeHtml(value) {
@@ -64,6 +66,7 @@ function loadEditorState() {
     }
 }
 
+// localStorage.removeItem("medicin-list-editor");
 const editorState = loadEditorState();
 
 // load persisted state before rendering

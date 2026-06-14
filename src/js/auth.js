@@ -11,7 +11,7 @@ export const users = [
 ];
 
 // Choose who is logged in
-export const currentUser = users[1];
+export const currentUser = users[0];
 
 
 // admin mode

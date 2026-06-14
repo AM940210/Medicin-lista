@@ -12,12 +12,39 @@ export const residents = [
         notes: ""
     },
     {
+        room: "1605",
+        morning: ["08:00"],
+        lunch: [""],
+        dinner: [""],
+        evening: ["20:00"],
+        shower: "Torsdag + Renbäddning",
+        notes: ""
+    },
+    {
+        room: "1606",
+        morning: [""],
+        lunch: [""],
+        dinner: [""],
+        evening: [""],
+        shower: "Onsdag + Renbäddning",
+        notes: ""
+    },
+    {
         room: "1607",
         morning: ["08:00"],
         lunch: ["14:00"],
         dinner: [],
         evening: ["20:00", "23:00"],
-        shower: "Måndag",
+        shower: "Måndag + Renbäddning",
+        notes: "Avföringlista"
+    },
+    {
+        room: "1608",
+        morning: ["08:00"],
+        lunch: [""],
+        dinner: [""],
+        evening: ["", ""],
+        shower: "Lördag + Renbäddning",
         notes: "Avföringlista"
     },
     {
@@ -26,8 +53,53 @@ export const residents = [
         lunch: ["12:00", "14:00"],
         dinner: ["18:00"],
         evening: ["22:00"],
-        shower: "Onsdag",
+        shower: "Onsdag + Renbäddning",
         notes: "Stödstrumpor"
+    },
+    {
+        room: "1610",
+        morning: ["08:00"],
+        lunch: ["13:00"],
+        dinner: ["17:00"],
+        evening: ["21:00"],
+        shower: "Fredag + Renbäddning",
+        notes: ""
+    },
+    {
+        room: "1611",
+        morning: ["08:00"],
+        lunch: ["14:00"],
+        dinner: [""],
+        evening: ["20:00", "21:30"],
+        shower: "Måndag + Renbäddning",
+        notes: ""
+    },
+    {
+        room: "1612",
+        morning: ["08:00"],
+        lunch: ["14:00"],
+        dinner: [""],
+        evening: ["20:00"],
+        shower: "Tisdag + Renbäddning",
+        notes: ""
+    },
+    {
+        room: "1613",
+        morning: ["08:00"],
+        lunch: [""],
+        dinner: [""],
+        evening: ["20:00", "21:00"],
+        shower: "Fredag + Renbäddning",
+        notes: ""
+    },
+    {
+        room: "1614",
+        morning: ["08:00"],
+        lunch: [""],
+        dinner: [""],
+        evening: ["20:00"],
+        shower: "Tors på Kväll + Renbäddning & Sön på dag",
+        notes: ""
     },
     {
         room: "1615",
