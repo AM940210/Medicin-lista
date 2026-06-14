@@ -72,7 +72,7 @@ h1 {
     background: #9d7c70;
 }
 
-.notes-input {
+.notes-input, .shower-input {
     width: 100%;
     min-height: 80px;
     border: 1px solid #d7d7d7;

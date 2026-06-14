@@ -219,15 +219,40 @@ function renderExtraCell(value, rowIndex, columnKey) {
     `;
 }
 
+function renderShowerCell(value, rowIndex) {
+    const disabled =
+        currentUser.role === "staff"
+            ? "disabled"
+            : "";
+
+    return `
+        <div class="cell">
+            <textarea
+                class="shower-input"
+                data-row-index="${rowIndex}"
+                data-field="shower"
+                ${disabled}
+            >${escapeHtml(value)}</textarea>
+        </div>
+    `;
+}
+
 function renderRow(row, rowIndex, columns) {
     const taskColumns = ["morning", "lunch", "dinner", "evening"];
 
     const cells = columns.map(column => {
-        if (column.key === "room" || column.key === "shower") {
+        if (column.key === "room") {
             return renderTextCell(
-                row[column.key] ?? "", 
+                row.room ?? "", 
                 rowIndex, 
-                column.key
+                "room"
+            );
+        }
+
+        if (column.key === "shower") {
+            return renderShowerCell(
+                row.shower ?? "",
+                rowIndex
             );
         }
 
