@@ -106,7 +106,7 @@ function addColumn(afterKey) {
     const newColumn = {
         key: `extra-${Date.now()}-${nextNumber}`,
         label: prompt("Medication time?") || `Extra ${nextNumber}`,
-        type: "text",
+        type: "tasks",
         width: "180px",
         addable: false,
         afterKey
@@ -118,10 +118,7 @@ function addColumn(afterKey) {
 
     editorState.rows = editorState.rows.map(row => ({
         ...row,
-        extra: {
-            ...(row.extra || {}),
-            [newColumn.key]: ""
-        }
+        [newColumn.key]: []
     }));
     
     saveEditorState();
@@ -163,6 +160,41 @@ function renderHeader(columns) {
             </div>
         `;
     }).join("");
+}
+
+function renderAddTimeButton(rowIndex, field) {
+    if (currentUser.role !== "admin") {
+        return "";
+    }
+
+    return `
+        <button
+            class="mini-btn add-time-btn"
+            data-action="add-time"
+            data-row-index="${rowIndex}"
+            data-field="${field}">
+            + Add Time
+        </button>
+    `;
+}
+
+function addTime(rowIndex, field) {
+
+    const time = prompt("Ange tid (HH:MM)");
+
+    if (!time) return;
+
+    if (!editorState.rows[rowIndex][field].includes(time)) {
+        
+        editorState.rows[rowIndex][field].push(time);
+
+        editorState.rows[rowIndex][field].sort();
+
+    } 
+
+    saveEditorState();
+
+    render();
 }
 
 function renderTextCell(value, rowIndex, field) {
@@ -238,7 +270,9 @@ function renderShowerCell(value, rowIndex) {
 }
 
 function renderRow(row, rowIndex, columns) {
-    const taskColumns = ["morning", "lunch", "dinner", "evening"];
+    const taskColumns = columns
+        .filter(column => column.type === "tasks")
+        .map(column => column.key);
 
     const cells = columns.map(column => {
         if (column.key === "room") {
@@ -267,6 +301,8 @@ function renderRow(row, rowIndex, columns) {
             return `
                 <div class="cell">
                     ${(row[column.key] ?? []).map(time => createTask(row.room || `row-${rowIndex}`, time)).join("")}
+
+                    ${renderAddTimeButton(rowIndex, column.key)}
                 </div>
             `;
         }
@@ -318,6 +354,17 @@ function render() {
     schedule.querySelectorAll('[data-action="add-column"]').forEach(button => {
         button.addEventListener("click", () => {
             addColumn(button.dataset.afterKey);
+        });
+    });
+
+    schedule.querySelectorAll('[data-action="add-time"]').forEach(button => {
+        button.addEventListener("click", () => {
+
+            addTime(
+                Number(button.dataset.rowIndex),
+                button.dataset.field
+            );
+
         });
     });
 }
